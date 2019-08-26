@@ -1,0 +1,30 @@
+{
+  "compilerOptions": {
+    "target": "es6",
+    "sourceMap": false,
+    "module": "esnext",
+    "removeComments": false,
+    "moduleResolution": "node",
+    "allowJs": true,
+    "experimentalDecorators": true,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "downlevelIteration": true,
+    "lib": ["es2018", "dom"],
+    "outDir": "build/",
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "react"
+  },
+  "files": ["src/index.tsx"],
+  "include": ["src"]
+}
