@@ -51,22 +51,16 @@ export const createCollectionStore = <
 
 export function createEntitiesStore<
   T extends {
-    [k: string]: AnyModel;
-  },
-  Stores = {
-    [P in keyof T]: ModelClass<T[P]>;
+    [k: string]: ModelClass<AnyModel>;
   }
->(collectionStores: Stores) {
-  const modelProps = Object.entries(collectionStores).reduce(
-    (acc, [key, value]) => {
-      acc[key] = prop<InstanceType<typeof value>>(
-        () => new value({}),
-      );
+>(collectionStores: T) {
+  const modelProps: ModelProps = {};
 
-      return acc;
-    },
-    {} as ModelProps,
-  );
+  Object.entries(collectionStores).forEach(([key, value]) => {
+    modelProps[key] = prop<InstanceType<typeof value>>(
+      () => new value({}),
+    );
+  });
 
   @model('EntitiesStore')
   class EntitiesStore extends Model(modelProps) {
