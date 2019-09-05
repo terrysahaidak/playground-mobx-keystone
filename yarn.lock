@@ -5647,11 +5647,11 @@ mkdirp@0.5.1, mkdirp@0.5.x, mkdirp@^0.5.0, mkdirp@^0.5.1, mkdirp@~0.5.1:
   dependencies:
     minimist "0.0.8"
 
-mobx-keystone@^0.12.4:
-  version "0.12.4"
-  resolved "https://registry.yarnpkg.com/mobx-keystone/-/mobx-keystone-0.12.4.tgz#fc1a1e4cd84a2f62f3a6ff060ee9d47f5666c813"
+mobx-keystone@^0.14.1:
+  version "0.14.1"
+  resolved "https://registry.yarnpkg.com/mobx-keystone/-/mobx-keystone-0.14.1.tgz#634ce589a59345860e539e8381eb82c6110d61f9"
   dependencies:
-    ts-toolbelt "^3.8.3"
+    ts-toolbelt "^3.8.63"
 
 mobx-react-lite@1.4.0:
   version "1.4.0"
@@ -8431,9 +8431,9 @@ ts-pnp@1.1.2, ts-pnp@^1.1.2:
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/ts-pnp/-/ts-pnp-1.1.2.tgz#be8e4bfce5d00f0f58e0666a82260c34a57af552"
 
-ts-toolbelt@^3.8.3:
-  version "3.8.42"
-  resolved "https://registry.yarnpkg.com/ts-toolbelt/-/ts-toolbelt-3.8.42.tgz#cd23c8ca3807a4fe9b1e2c5c393e2afb8305aa0c"
+ts-toolbelt@^3.8.63:
+  version "3.8.63"
+  resolved "https://registry.yarnpkg.com/ts-toolbelt/-/ts-toolbelt-3.8.63.tgz#ee5a94a5d870f437bc6811f7428ea24c78821f6a"
 
 tslib@^1.8.1:
   version "1.10.0"

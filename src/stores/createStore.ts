@@ -1,6 +1,10 @@
 import React, { useContext } from 'react';
 import { RootStore } from './RootStore';
-import { registerRootStore, AnyModel } from 'mobx-keystone';
+import {
+  registerRootStore,
+  AnyModel,
+  onSnapshot,
+} from 'mobx-keystone';
 
 // const rootStoreSnapshot = fromSnapshot<RootStore>({
 //   todoList: {
@@ -11,6 +15,10 @@ import { registerRootStore, AnyModel } from 'mobx-keystone';
 export function createStore() {
   const rootStore = new RootStore({});
   registerRootStore(rootStore);
+
+  // onSnapshot(rootStore, (snapshot) => {
+  //   console.log('Snapshot', { snapshot });
+  // });
 
   return rootStore;
 }

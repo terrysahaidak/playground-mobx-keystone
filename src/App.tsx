@@ -1,14 +1,88 @@
-import React, { useState, ChangeEvent } from 'react';
+import './App.css';
+import React, { useState, ChangeEvent, useEffect } from 'react';
 import { useKeystone } from './stores/createStore';
 import { useObserver } from 'mobx-react';
+import { TodoModel } from './stores/Todos/TodoModel';
+import { Ref } from 'mobx-keystone';
+import { GroupList as IGroupList } from './stores/Group/GroupListStore';
+import { GroupModel } from './stores/Group/GroupModel';
+
+interface TodoListProps {
+  list: Ref<TodoModel>[];
+}
+
+function TodoList({ list }: TodoListProps) {
+  return useObserver(() => {
+    try {
+      const text = list.map((item) => item.current.text);
+    } catch (err) {
+      console.log(err);
+    }
+
+    return (
+      <ul>
+        {list.map((item) => (
+          <li
+            style={{
+              textDecoration: item.current.completed
+                ? 'line-through'
+                : 'none',
+            }}
+            onClick={item.current.toggleCompleted.run}>
+            {item.current.text}
+
+            <button
+              onClick={(evt) => {
+                evt.stopPropagation();
+                item.current.remove();
+              }}>
+              Remove
+            </button>
+          </li>
+        ))}
+      </ul>
+    );
+  });
+}
+
+interface GroupListProps {
+  list: IGroupList;
+}
+
+function GroupList({ list }: GroupListProps) {
+  function handleSelect(item: GroupModel) {
+    return (evt: React.MouseEvent<HTMLElement>) => {
+      evt.preventDefault();
+
+
+      item.select();
+    };
+  }
+
+  return useObserver(() => {
+    return (
+      <ul>
+        {list.list.map((item) => (
+          <li key={item.id} onClick={handleSelect(item.current)}>
+            {item.current.title}
+          </li>
+        ))}
+      </ul>
+    );
+  });
+}
 
 function App() {
   const rootStore = useKeystone();
-  const { todoList } = rootStore;
+  const { groupList } = rootStore;
   const [value, setValue] = useState('');
 
+  useEffect(() => {
+    groupList.fetch.run();
+  }, []);
+
   function handleAdd() {
-    rootStore.addTodo(value);
+    // rootStore.addTodo(value);
     setValue('');
   }
 
@@ -21,53 +95,26 @@ function App() {
       rootStore.selected &&
       rootStore.selected.isValid &&
       rootStore.selected.current;
+
     return (
       <div className="App">
-        <header className="App-header">
-          <input value={value} onChange={handleChange} />
-          <button onClick={handleAdd} type="button">
-            Add
-          </button>
-        </header>
+        <main className="main">
+          <aside>
+            <GroupList list={groupList} />
+          </aside>
 
-        <p
-          style={{
-            textDecoration:
-              selected && selected.completed
-                ? 'line-through'
-                : 'none',
-          }}>
-          Selected: {selected && selected.text}
-        </p>
-        {rootStore.isLoading && 'Loading'}
-        <ul>
-          {todoList.list.map((item) => (
-            <li
-              style={{
-                textDecoration: item.completed
-                  ? 'line-through'
-                  : 'none',
-              }}
-              onClick={item.toggleCompleted.run}>
-              {item.text}
-
-              <button
-                onClick={(evt) => {
-                  evt.stopPropagation();
-                  item.select();
-                }}>
-                Select
+          <div className="list">
+            <header className="App-header">
+              <input value={value} onChange={handleChange} />
+              <button onClick={handleAdd} type="button">
+                Add
               </button>
-              <button
-                onClick={(evt) => {
-                  evt.stopPropagation();
-                  item.remove();
-                }}>
-                Remove
-              </button>
-            </li>
-          ))}
-        </ul>
+            </header>
+            {rootStore.selected && (
+              <TodoList list={rootStore.selected.current.todos} />
+            )}
+          </div>
+        </main>
       </div>
     );
   });

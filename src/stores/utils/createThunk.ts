@@ -1,6 +1,11 @@
-import { getRoot, getParent, runUnprotected } from 'mobx-keystone';
+import { getRoot, runUnprotected } from 'mobx-keystone';
 import { computed, observable, action } from 'mobx';
-import { normalize, Schema } from 'normalizr';
+import {
+  normalize,
+  Schema,
+  SchemaArray,
+  SchemaObject,
+} from 'normalizr';
 import uuid from 'uuid/v1';
 // import { RootStore } from '../RootStore';
 
@@ -14,9 +19,20 @@ import uuid from 'uuid/v1';
 
 type Thunk = (...args: any[]) => (flow: AsyncModel) => any;
 
+export type SchemaOf<T> = T extends SchemaArray<infer R>
+  ? R[]
+  : T extends SchemaObject<infer R>
+  ? R
+  : never;
+
 export class AsyncModel {
-  constructor(private _thunk: Thunk, private _auto?: boolean) {
+  constructor(
+    private _model: any,
+    private _thunk: Thunk,
+    private _auto?: boolean,
+  ) {
     this._thunk = _thunk;
+    this._model = _model;
     this._auto = _auto;
 
     this.run = this.run.bind(this);
@@ -26,26 +42,18 @@ export class AsyncModel {
   @observable inProgressRetry: boolean = false;
   @observable error: boolean = false;
   @observable hasEverBeenRan: boolean = false;
-  @observable throwable: boolean = false;
+  @observable throwable: boolean = true;
 
-  @computed
-  get isError(): boolean {
+  @computed get isError() {
     return Boolean(this.error);
   }
 
-  @computed
-  get canBeRun(): boolean {
+  @computed get canBeRun() {
     return !this.error && !this.inProgress;
   }
 
-  @computed
-  get inProgressAgain(): boolean {
+  @computed get inProgressAgain() {
     return this.inProgress && this.hasEverBeenRan;
-  }
-
-  @computed
-  get parent(): any {
-    return getParent(this, true);
   }
 
   @action
@@ -74,6 +82,8 @@ export class AsyncModel {
 
   @action
   failed(err: any, throwError = this.throwable) {
+    console.error(err);
+
     if (!this.hasEverBeenRan) {
       this.hasEverBeenRan = true;
     }
@@ -111,14 +121,15 @@ export class AsyncModel {
   }
 
   @action
-  merge(collection: any, scheme: Schema) {
-    const { result, entities } = this.normalize(collection, scheme);
+  merge<R extends any>(collection: any, scheme: Schema) {
+    const { result, entities } = normalize<any, any, R>(
+      collection,
+      scheme,
+    );
 
-    getRoot(this).entities.merge(entities);
+    getRoot(this._model).entities.merge(entities);
 
-    return {
-      result,
-    };
+    return result;
   }
 
   @action
@@ -168,10 +179,11 @@ export class AsyncModel {
 // }
 
 export default function createThunk(
+  model: any,
   thunk: Thunk,
-  auto?: boolean,
+  auto: boolean = true,
 ): AsyncModel {
-  const instance = new AsyncModel(thunk, auto);
+  const instance = new AsyncModel(model, thunk, auto);
 
   return instance;
 }
