@@ -8,7 +8,3 @@ export class TodoCollectionStore extends CollectionStore<TodoModel>(
 ) {
   // you can add all the async actions here
 }
-
-export type ITodoCollectionStore = InstanceType<
-  typeof TodoCollectionStore
->;

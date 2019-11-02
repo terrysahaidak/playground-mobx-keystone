@@ -7,6 +7,7 @@ import {
   SchemaObject,
 } from 'normalizr';
 import uuid from 'uuid/v1';
+import { Arguments } from 'yargs';
 // import { RootStore } from '../RootStore';
 
 // const ErrorModel = types.model({
@@ -16,7 +17,6 @@ import uuid from 'uuid/v1';
 //   errorCode: types.maybeNull(types.string),
 //   meta: types.maybeNull(types.frozen({})),
 // });
-
 type Thunk = (...args: any[]) => (flow: AsyncModel) => any;
 
 export type SchemaOf<T> = T extends SchemaArray<infer R>
@@ -29,11 +29,13 @@ export class AsyncModel {
   constructor(
     private _model: any,
     private _thunk: Thunk,
-    private _auto?: boolean,
+    private _auto: boolean = true,
+    private _throwError: boolean = true,
   ) {
     this._thunk = _thunk;
     this._model = _model;
     this._auto = _auto;
+    this._throwError = _throwError;
 
     this.run = this.run.bind(this);
   }
@@ -42,7 +44,7 @@ export class AsyncModel {
   @observable inProgressRetry: boolean = false;
   @observable error: boolean = false;
   @observable hasEverBeenRan: boolean = false;
-  @observable throwable: boolean = true;
+  @observable throwable: boolean = this._throwError;
 
   @computed get isError() {
     return Boolean(this.error);
@@ -150,7 +152,7 @@ export class AsyncModel {
   }
 
   @action
-  run(...args: any[]) {
+  run<T = Thunk>(args: Parameters<T> {
     const promise = () => this._thunk(...args)(this);
 
     if (this._auto) {
@@ -159,6 +161,29 @@ export class AsyncModel {
 
     return promise();
   }
+}
+
+export function thunk(auto = true, throwError = true) {
+  return function decorator(target: any, key: string) {
+    let thunk: Thunk = target[key];
+
+    const instance = new AsyncModel(target, thunk, auto, throwError);
+
+    const getter = (): AsyncModel => {
+      return instance;
+    };
+
+    const setter = (next: any) => {
+      throw new Error('Cannot set the new value to the thunk');
+    };
+
+    Object.defineProperty(target, key, {
+      get: getter,
+      set: setter,
+      enumerable: false,
+      configurable: true,
+    });
+  };
 }
 
 // export default function modelThunk(auto?: boolean) {
@@ -178,12 +203,10 @@ export class AsyncModel {
 //   };
 // }
 
-export default function createThunk(
-  model: any,
-  thunk: Thunk,
-  auto: boolean = true,
-): AsyncModel {
-  const instance = new AsyncModel(model, thunk, auto);
+function castToAsyncModel(thunk: any) {
+  return thunk as AsyncModel;
+}
 
-  return instance;
+export default function createThunk(thunk: Thunk): AsyncModel {
+  return castToAsyncModel(thunk);
 }

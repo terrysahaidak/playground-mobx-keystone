@@ -28,7 +28,8 @@ function TodoList({ list }: TodoListProps) {
                 ? 'line-through'
                 : 'none',
             }}
-            onClick={item.current.toggleCompleted.run}>
+            // onClick={item.current.toggleCompleted.run}
+          >
             {item.current.text}
 
             <button
@@ -53,7 +54,6 @@ function GroupList({ list }: GroupListProps) {
   function handleSelect(item: GroupModel) {
     return (evt: React.MouseEvent<HTMLElement>) => {
       evt.preventDefault();
-
 
       item.select();
     };

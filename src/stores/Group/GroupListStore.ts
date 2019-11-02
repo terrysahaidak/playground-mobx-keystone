@@ -8,27 +8,30 @@ import {
   SnapshotInOf,
 } from 'mobx-keystone';
 import { GroupModel, groupRef } from './GroupModel';
-import createThunk from '../utils/createThunk';
+import createThunk, { thunk } from '../utils/createThunk';
 import { Api } from '../../Api';
 
 @model('GroupList')
 export class GroupList extends Model({
   list: prop<Ref<GroupModel>[]>(() => []),
 }) {
-  fetch = createThunk(this, () => async (flow) => {
-    const groups = await Api.Groups.getAll();
+  @thunk() fetch = createThunk(
+    (id: number) =>
+      async function(this: GroupList, flow) {
+        const groups = await Api.Groups.getAll();
 
-    const result = flow.merge<string[]>(groups, GroupCollection);
+        const result = flow.merge<string[]>(groups, GroupCollection);
 
-    try {
-      flow.update(() => {
-        this.list = result.map(groupRef);
-        debugger;
-      });
-    } catch (err) {
-      debugger;
-    }
-  });
+        try {
+          flow.update(() => {
+            this.list = result.map(groupRef);
+            debugger;
+          });
+        } catch (err) {
+          debugger;
+        }
+      },
+  );
 
   @modelAction
   remove(group: GroupModel) {
@@ -39,3 +42,7 @@ export class GroupList extends Model({
     }
   }
 }
+
+const list = new GroupList({});
+
+list.fetch.run()

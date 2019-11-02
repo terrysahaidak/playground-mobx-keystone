@@ -82,3 +82,26 @@ snapshot.selected = getSnapshot(todoRef(id));
 const newRootStore = fromSnapshot<RootStore>(snapshot);
 
 console.log(snapshot);
+
+// @model('Application')
+// class Application extends Model({}) {
+//   get post() {
+//     // how to get the post itself here?
+//   }
+// }
+
+// @model('Post')
+// class Post extends Model({
+//   application: prop<Ref<Application> | undefined>(),
+// }) {
+//   @modelAction
+//   setApplication(application: Application) {
+//     this.application = applicationRef(application);
+//   }
+// }
+
+// @model('RootStore')
+// class RootStore extends Model({
+//   applicationCollection: prop(() => objectMap<Application>()),
+//   posts: prop<Post[]>(() => []),
+// }) {}

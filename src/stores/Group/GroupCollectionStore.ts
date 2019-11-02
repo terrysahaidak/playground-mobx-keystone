@@ -10,7 +10,3 @@ export class GroupCollectionStore extends CollectionStore<GroupModel>(
     return 'string';
   }
 }
-
-export type IGroupCollectionStore = InstanceType<
-  typeof GroupCollectionStore
->;
