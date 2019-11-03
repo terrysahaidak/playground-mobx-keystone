@@ -25,7 +25,6 @@ export class GroupList extends Model({
         try {
           flow.update(() => {
             this.list = result.map(groupRef);
-            debugger;
           });
         } catch (err) {
           debugger;
@@ -42,7 +41,3 @@ export class GroupList extends Model({
     }
   }
 }
-
-const list = new GroupList({});
-
-list.fetch.run()

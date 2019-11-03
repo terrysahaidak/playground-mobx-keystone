@@ -17,7 +17,7 @@ import { Arguments } from 'yargs';
 //   errorCode: types.maybeNull(types.string),
 //   meta: types.maybeNull(types.frozen({})),
 // });
-type Thunk = (...args: any[]) => (flow: AsyncModel) => any;
+// type Thunk = (...args: any[]) => (flow: AsyncModel) => any;
 
 export type SchemaOf<T> = T extends SchemaArray<infer R>
   ? R[]
@@ -25,152 +25,14 @@ export type SchemaOf<T> = T extends SchemaArray<infer R>
   ? R
   : never;
 
-export class AsyncModel {
-  constructor(
-    private _model: any,
-    private _thunk: Thunk,
-    private _auto: boolean = true,
-    private _throwError: boolean = true,
-  ) {
-    this._thunk = _thunk;
-    this._model = _model;
-    this._auto = _auto;
-    this._throwError = _throwError;
-
-    this.run = this.run.bind(this);
-  }
-
-  @observable inProgress: boolean = false;
-  @observable inProgressRetry: boolean = false;
-  @observable error: boolean = false;
-  @observable hasEverBeenRan: boolean = false;
-  @observable throwable: boolean = this._throwError;
-
-  @computed get isError() {
-    return Boolean(this.error);
-  }
-
-  @computed get canBeRun() {
-    return !this.error && !this.inProgress;
-  }
-
-  @computed get inProgressAgain() {
-    return this.inProgress && this.hasEverBeenRan;
-  }
-
-  @action
-  start(retry = false) {
-    if (retry) {
-      this.inProgressRetry = true;
-    } else {
-      this.inProgress = true;
-    }
-
-    this.error = false;
-  }
-
-  @action
-  success() {
-    if (!this.hasEverBeenRan) {
-      this.hasEverBeenRan = true;
-    }
-
-    if (this.inProgressRetry) {
-      this.inProgressRetry = false;
-    } else {
-      this.inProgress = false;
-    }
-  }
-
-  @action
-  failed(err: any, throwError = this.throwable) {
-    console.error(err);
-
-    if (!this.hasEverBeenRan) {
-      this.hasEverBeenRan = true;
-    }
-
-    if (this.inProgressRetry) {
-      this.inProgressRetry = false;
-    } else {
-      this.inProgress = false;
-    }
-
-    this.error = true;
-
-    // const response = err?.response;
-
-    // this.error = {
-    //   message: response?.data?.message ?? err?.message,
-    //   status: response?.status ?? null,
-    //   reason: response?.data?.reason ?? null,
-    //   errorCode: response?.data?.error ?? null,
-    //   meta: response?.data?.meta ?? null,
-    // };
-
-    if (throwError) {
-      throw err;
-    }
-  }
-
-  normalize(collection: any, scheme: Schema) {
-    return normalize(collection, scheme);
-  }
-
-  @action
-  throwError(value: boolean) {
-    this.throwable = value;
-  }
-
-  @action
-  merge<R extends any>(collection: any, scheme: Schema) {
-    const { result, entities } = normalize<any, any, R>(
-      collection,
-      scheme,
-    );
-
-    getRoot(this._model).entities.merge(entities);
-
-    return result;
-  }
-
-  @action
-  async auto(promise: { (): any; (): void }) {
-    try {
-      this.start();
-
-      await promise();
-
-      this.success();
-    } catch (err) {
-      this.failed(err);
-    }
-  }
-
-  update(cb: () => void) {
-    runUnprotected(cb);
-  }
-
-  @action
-  run<T = Thunk>(args: Parameters<T> {
-    const promise = () => this._thunk(...args)(this);
-
-    if (this._auto) {
-      return this.auto(promise);
-    }
-
-    return promise();
-  }
-}
-
 export function thunk(auto = true, throwError = true) {
   return function decorator(target: any, key: string) {
-    let thunk: Thunk = target[key];
+    let asyncInstance: ReturnType<typeof createThunk> = target[key];
 
-    const instance = new AsyncModel(target, thunk, auto, throwError);
+    asyncInstance._init({ model: target, auto, throwError });
 
-    const getter = (): AsyncModel => {
-      return instance;
+    const getter = (): typeof asyncInstance => {
+      return asyncInstance;
     };
 
     const setter = (next: any) => {
@@ -203,10 +65,162 @@ export function thunk(auto = true, throwError = true) {
 //   };
 // }
 
-function castToAsyncModel(thunk: any) {
-  return thunk as AsyncModel;
-}
+export default function createThunk<A extends any[]>(
+  thunk: (
+    ...args: A
+  ) => (flow: ReturnType<typeof createThunk>) => any,
+) {
+  class AsyncModel {
+    private _model: any;
+    private _auto: boolean = true;
+    private _throwError: boolean = true;
 
-export default function createThunk(thunk: Thunk): AsyncModel {
-  return castToAsyncModel(thunk);
+    constructor() {
+      // this.run = this.run.bind(this);
+    }
+
+    _init({
+      model,
+      auto,
+      throwError,
+    }: {
+      model: any;
+      auto: boolean;
+      throwError: boolean;
+    }) {
+      this._model = model;
+      this._auto = auto;
+      this._throwError = throwError;
+    }
+
+    @observable inProgress: boolean = false;
+    @observable inProgressRetry: boolean = false;
+    @observable error: boolean = false;
+    @observable hasEverBeenRan: boolean = false;
+    @observable throwable: boolean = this._throwError;
+
+    @computed get isError() {
+      return Boolean(this.error);
+    }
+
+    @computed get canBeRun() {
+      return !this.error && !this.inProgress;
+    }
+
+    @computed get inProgressAgain() {
+      return this.inProgress && this.hasEverBeenRan;
+    }
+
+    @action
+    start(retry = false) {
+      if (retry) {
+        this.inProgressRetry = true;
+      } else {
+        this.inProgress = true;
+      }
+
+      this.error = false;
+    }
+
+    @action
+    success() {
+      if (!this.hasEverBeenRan) {
+        this.hasEverBeenRan = true;
+      }
+
+      if (this.inProgressRetry) {
+        this.inProgressRetry = false;
+      } else {
+        this.inProgress = false;
+      }
+    }
+
+    @action
+    failed(err: any, throwError = this.throwable) {
+      console.error(err);
+
+      if (!this.hasEverBeenRan) {
+        this.hasEverBeenRan = true;
+      }
+
+      if (this.inProgressRetry) {
+        this.inProgressRetry = false;
+      } else {
+        this.inProgress = false;
+      }
+
+      this.error = true;
+
+      // const response = err?.response;
+
+      // this.error = {
+      //   message: response?.data?.message ?? err?.message,
+      //   status: response?.status ?? null,
+      //   reason: response?.data?.reason ?? null,
+      //   errorCode: response?.data?.error ?? null,
+      //   meta: response?.data?.meta ?? null,
+      // };
+
+      if (throwError) {
+        throw err;
+      }
+    }
+
+    normalize(collection: any, scheme: Schema) {
+      return normalize(collection, scheme);
+    }
+
+    @action
+    throwError(value: boolean) {
+      this.throwable = value;
+    }
+
+    @action
+    merge<R extends any>(collection: any, scheme: Schema) {
+      const { result, entities } = normalize<any, any, R>(
+        collection,
+        scheme,
+      );
+
+      getRoot(this._model).entities.merge(entities);
+
+      return result;
+    }
+
+    @action
+    async auto(promise: { (): any; (): void }) {
+      try {
+        this.start();
+
+        await promise();
+
+        this.success();
+      } catch (err) {
+        this.failed(err);
+      }
+    }
+
+    update(cb: () => void) {
+      runUnprotected(cb);
+    }
+
+    @action
+    run<R extends Promise<any>, T extends typeof thunk>(
+      ...args: Parameters<T>
+    ): R {
+      const promise = () => {
+        const _thunk = thunk(...args);
+
+        return _thunk.bind(this._model)(this);
+      };
+
+      if (this._auto) {
+        return this.auto(promise) as R;
+      }
+
+      return promise();
+    }
+  }
+
+  return new AsyncModel();
 }
