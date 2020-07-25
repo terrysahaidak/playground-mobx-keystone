@@ -1,9 +1,9 @@
-import { CollectionStore } from '../utils/createCollectionStore';
+import { CollectionModel } from '../../../libs/mobx-keystone-collections';
 import { TodoModel } from './TodoModel';
-import { ExtendedModel, model } from 'mobx-keystone';
+import { model } from 'mobx-keystone';
 
 @model('TodoCollectionStore')
-export class TodoCollectionStore extends CollectionStore<TodoModel>(
+export class TodoCollectionStore extends CollectionModel<TodoModel>(
   TodoModel,
 ) {
   // you can add all the async actions here

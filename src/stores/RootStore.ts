@@ -9,13 +9,15 @@ import {
 import { EntitiesStore } from './EntitiesStore';
 import { GroupList } from './Group/GroupListStore';
 import { GroupModel, groupRef } from './Group/GroupModel';
+import { TodoModel } from './Todos/TodoModel';
+import { observable } from 'mobx';
 
 @model('RootStore')
 export class RootStore extends Model({
   groupList: prop<GroupList>(() => new GroupList({})),
   selected: prop<Ref<GroupModel> | undefined>(),
   entities: prop<EntitiesStore>(() => new EntitiesStore({})),
-  collection: prop(() => objectMap<GroupModel>()),
+  // collection: prop(() => objectMap<GroupModel>()),
 }) {
   @modelAction setSelected(group: GroupModel) {
     this.selected = groupRef(group);

@@ -8,22 +8,6 @@ import {
 } from 'normalizr';
 import uuid from 'uuid/v1';
 import { Arguments } from 'yargs';
-// import { RootStore } from '../RootStore';
-
-// const ErrorModel = types.model({
-//   message: '',
-//   status: types.maybeNull(types.number),
-//   reason: types.maybeNull(types.string),
-//   errorCode: types.maybeNull(types.string),
-//   meta: types.maybeNull(types.frozen({})),
-// });
-// type Thunk = (...args: any[]) => (flow: AsyncModel) => any;
-
-export type SchemaOf<T> = T extends SchemaArray<infer R>
-  ? R[]
-  : T extends SchemaObject<infer R>
-  ? R
-  : never;
 
 export function thunk(auto = true, throwError = true) {
   return function decorator(target: any, key: string) {
@@ -65,7 +49,7 @@ export function thunk(auto = true, throwError = true) {
 //   };
 // }
 
-export default function createThunk<A extends any[]>(
+export function createThunk<A extends any[]>(
   thunk: (
     ...args: A
   ) => (flow: ReturnType<typeof createThunk>) => any,
@@ -224,3 +208,4 @@ export default function createThunk<A extends any[]>(
 
   return new AsyncModel();
 }
+

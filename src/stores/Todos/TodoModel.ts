@@ -10,9 +10,15 @@ import {
   ModelCreationData,
 } from 'mobx-keystone';
 import uuid from 'uuid/v4';
-import createThunk, { thunk } from '../utils/createThunk';
-import { createRef } from '../utils/createEntityReference';
+import {
+  createThunk,
+  thunk,
+  createRef,
+  asEntityOptions,
+} from '../../../libs/mobx-keystone-collections';
+
 import { TodoList } from './TodoListStore';
+import { computed } from 'mobx';
 
 const delay = (time: number) =>
   new Promise((res) => setTimeout(res, time));
@@ -23,16 +29,22 @@ export class TodoModel extends Model({
   text: prop<string>(),
   completed: prop<boolean>(false),
 }) {
+  @modelAction setText(newText: string) {
+    this.text = newText;
+  }
 
+  @computed getTextAndCompleted() {
+    return this.text + this.completed;
+  }
 }
 
-type IBackendTodo= {
+type IBackendTodo = {
   title: string;
-}
+};
 
 const json: ModelCreationData<TodoModel> = {
   text: 'test',
-}
+};
 
 const m = new TodoModel(json);
 

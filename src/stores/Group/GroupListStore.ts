@@ -8,7 +8,10 @@ import {
   SnapshotInOf,
 } from 'mobx-keystone';
 import { GroupModel, groupRef } from './GroupModel';
-import createThunk, { thunk } from '../utils/createThunk';
+import {
+  createThunk,
+  thunk,
+} from '../../../libs/mobx-keystone-collections';
 import { Api } from '../../Api';
 
 @model('GroupList')
@@ -20,15 +23,9 @@ export class GroupList extends Model({
       async function(this: GroupList, flow) {
         const groups = await Api.Groups.getAll();
 
-        const result = flow.merge<string[]>(groups, GroupCollection);
-
-        try {
-          flow.update(() => {
-            this.list = result.map(groupRef);
-          });
-        } catch (err) {
-          debugger;
-        }
+        flow.update(() => {
+          this.list = groups.map((item) => GroupModel.ref(item.id));
+        });
       },
   );
 
@@ -41,3 +38,5 @@ export class GroupList extends Model({
     }
   }
 }
+
+const list = new GroupList({});

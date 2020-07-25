@@ -3582,6 +3582,10 @@ fast-deep-equal@^2.0.1:
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/fast-deep-equal/-/fast-deep-equal-2.0.1.tgz#7b05218ddf9667bf7f370bf7fdb2cb15fdd0aa49"
 
+fast-deep-equal@^3.1.1:
+  version "3.1.1"
+  resolved "https://registry.yarnpkg.com/fast-deep-equal/-/fast-deep-equal-3.1.1.tgz#545145077c501491e33b15ec408c294376e94ae4"
+
 fast-diff@^1.1.2:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/fast-diff/-/fast-diff-1.2.0.tgz#73ee11982d86caaf7959828d519cfe927fac5f03"
@@ -5647,11 +5651,14 @@ mkdirp@0.5.1, mkdirp@0.5.x, mkdirp@^0.5.0, mkdirp@^0.5.1, mkdirp@~0.5.1:
   dependencies:
     minimist "0.0.8"
 
-mobx-keystone@^0.14.1:
-  version "0.14.1"
-  resolved "https://registry.yarnpkg.com/mobx-keystone/-/mobx-keystone-0.14.1.tgz#634ce589a59345860e539e8381eb82c6110d61f9"
+mobx-keystone@^0.39.0:
+  version "0.39.0"
+  resolved "https://registry.yarnpkg.com/mobx-keystone/-/mobx-keystone-0.39.0.tgz#50da7de6fbcdd7718f0b2942b34e588630d6502b"
   dependencies:
-    ts-toolbelt "^3.8.63"
+    fast-deep-equal "^3.1.1"
+    ts-toolbelt "^6.1.4"
+    tslib "^1.10.0"
+    uuid "^3.3.3"
 
 mobx-react-lite@1.4.0:
   version "1.4.0"
@@ -8431,11 +8438,11 @@ ts-pnp@1.1.2, ts-pnp@^1.1.2:
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/ts-pnp/-/ts-pnp-1.1.2.tgz#be8e4bfce5d00f0f58e0666a82260c34a57af552"
 
-ts-toolbelt@^3.8.63:
-  version "3.8.63"
-  resolved "https://registry.yarnpkg.com/ts-toolbelt/-/ts-toolbelt-3.8.63.tgz#ee5a94a5d870f437bc6811f7428ea24c78821f6a"
+ts-toolbelt@^6.1.4:
+  version "6.1.11"
+  resolved "https://registry.yarnpkg.com/ts-toolbelt/-/ts-toolbelt-6.1.11.tgz#d2768e83a577e06e8c6f1252e0c3293736329e23"
 
-tslib@^1.8.1:
+tslib@^1.10.0, tslib@^1.8.1:
   version "1.10.0"
   resolved "https://registry.yarnpkg.com/tslib/-/tslib-1.10.0.tgz#c3c19f95973fb0a62973fb09d90d961ee43e5c8a"
 
@@ -8489,8 +8496,8 @@ typedarray@^0.0.6:
   resolved "https://registry.yarnpkg.com/typedarray/-/typedarray-0.0.6.tgz#867ac74e3864187b1d3d47d996a78ec5c8830777"
 
 typescript@^3.5.3:
-  version "3.5.3"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-3.5.3.tgz#c830f657f93f1ea846819e929092f5fe5983e977"
+  version "3.7.2"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-3.7.2.tgz#27e489b95fa5909445e9fef5ee48d81697ad18fb"
 
 uglify-js@3.4.x, uglify-js@^3.1.4:
   version "3.4.9"
@@ -8648,6 +8655,10 @@ utils-merge@1.0.1:
 uuid@^3.0.1, uuid@^3.3.2:
   version "3.3.2"
   resolved "https://registry.yarnpkg.com/uuid/-/uuid-3.3.2.tgz#1b4af4955eb3077c501c23872fc6513811587131"
+
+uuid@^3.3.3:
+  version "3.4.0"
+  resolved "https://registry.yarnpkg.com/uuid/-/uuid-3.4.0.tgz#b23e4358afa8a202fe7a100af1f5f883f02007ee"
 
 v8-compile-cache@^2.0.3:
   version "2.1.0"

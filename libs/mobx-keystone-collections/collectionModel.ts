@@ -8,16 +8,17 @@ import {
   objectMap,
   ExtendedModel,
   modelAction,
+  ObjectMap,
 } from 'mobx-keystone';
 
 type EntityID = number | string;
 
-export function CollectionStore<
+export function CollectionModel<
   T extends AnyModel,
   TClass = ModelClass<T>
 >(EntityModel: TClass) {
   class CollectionStore extends Model({
-    collection: prop(() => objectMap<T>()),
+    collection: prop<ObjectMap<T>>(() => objectMap()),
   }) {
     get(id: EntityID) {
       return this.collection.get(String(id));
@@ -46,7 +47,7 @@ export function CollectionStore<
     }
 
     @modelAction update(id: EntityID, value: SnapshotInOf<T>) {
-      const item = this.collection.get(String(id)) as T;
+      const item = this.collection.get(String(id));
       Object.assign(item, value);
     }
   }
@@ -54,6 +55,9 @@ export function CollectionStore<
   return ExtendedModel(CollectionStore, {});
 }
 
-export type ICollectionStore = InstanceType<
-  ReturnType<typeof CollectionStore>
+type GenericReturnType<F, T> = F extends (x: T) => (infer U) ? U : never
+
+export type ICollectionModel<T> = InstanceType<
+  GenericReturnType<typeof CollectionModel, T>
 >;
+
